@@ -1,12 +1,36 @@
-# Databricks — Estudo de Conceitos e Prática
+# Databricks Study
+![Databricks](https://img.shields.io/badge/Databricks-FF3621?style=flat&logo=databricks&logoColor=white)
+![Apache Spark](https://img.shields.io/badge/Apache%20Spark-3.5-E25A1C?style=flat&logo=apachespark&logoColor=white)
+![Delta Lake](https://img.shields.io/badge/Delta%20Lake-3.1-00ADD8?style=flat)
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat&logo=python&logoColor=white)
 
-Repositório de estudo sobre Azure Databricks: conceitos, arquitetura e notebooks práticos rodados no Databricks Community Edition.
+Estudo de conceitos e prática de Azure Databricks: Lakehouse, Delta Lake, Spark e arquitetura Medallion.
 
-Objetivo: entender **por que** o Databricks existe e resolve problemas reais de engenharia de dados, não só decorar comandos.
+## Sobre
+
+Repositório de estudo sobre Azure Databricks, com o objetivo de entender **por que** a plataforma existe e quais problemas reais de engenharia de dados ela resolve — não só decorar comandos. Combina documentação teórica em Markdown com notebooks práticos comentados, rodáveis no Databricks Community Edition.
+
+## Conteúdo
+
+- Conceito de Lakehouse e por que ele existe (Data Warehouse vs Data Lake)
+- Delta Lake: transações ACID, schema enforcement, time travel, MERGE
+- Clusters e Apache Spark: lazy evaluation, partições, autoscaling
+- Arquitetura Medallion (Bronze → Silver → Gold) aplicada num pipeline real
+- Unity Catalog: governança e linhagem de dados
+- Comparação Azure Databricks vs Azure Synapse Analytics
+
+## Stack
+
+- **Processamento:** Apache Spark (PySpark)
+- **Armazenamento:** Delta Lake
+- **Ambiente:** Databricks Community Edition
+- **Linguagem:** Python
+
+---
 
 ## Estrutura
 
-```
+\```
 databricks-study/
 ├── docs/                          # Teoria, conceitos, comparações
 │   ├── 01-lakehouse-conceito.md
@@ -21,14 +45,20 @@ databricks-study/
 │   ├── 03_medallion_pipeline_demo.py
 │   └── 04_time_travel_demo.py
 └── requirements.txt
-```
+\```
 
-## Como rodar os notebooks
+## Como rodar localmente
 
-1. Crie uma conta gratuita em [community.cloud.databricks.com](https://community.cloud.databricks.com)
-2. Suba os arquivos `.py` da pasta `notebooks/` — o Databricks reconhece o marcador `# COMMAND ----------` e importa como células separadas automaticamente
-3. Suba um cluster (Community Edition tem 1 cluster free, 15GB)
-4. Rode as células em ordem
+**Pré-requisitos:** conta gratuita em [community.cloud.databricks.com](https://community.cloud.databricks.com)
+
+1. Suba os arquivos `.py` da pasta `notebooks/` — o Databricks reconhece o marcador `# COMMAND ----------` e importa como células separadas automaticamente
+2. Suba um cluster (Community Edition tem 1 cluster free, 15GB)
+3. Rode as células em ordem
+
+Alternativamente, dá para rodar localmente com PySpark + Delta Lake instalados (ver `requirements.txt`):
+\```bash
+pip install -r requirements.txt
+\```
 
 ## Ordem de leitura sugerida
 
@@ -42,5 +72,3 @@ databricks-study/
 8. `notebooks/04_time_travel_demo.py` — versionamento de tabelas
 9. `docs/05-unity-catalog.md` — governança de dados
 10. `docs/06-databricks-vs-synapse.md` — quando usar cada um no ecossistema Azure
-
-
