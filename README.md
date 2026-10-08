@@ -1,76 +1,69 @@
-# Databricks Study
-![Databricks](https://img.shields.io/badge/Databricks-FF3621?style=flat&logo=databricks&logoColor=white)
-![Apache Spark](https://img.shields.io/badge/Apache%20Spark-3.5-E25A1C?style=flat&logo=apachespark&logoColor=white)
-![Delta Lake](https://img.shields.io/badge/Delta%20Lake-3.1-00ADD8?style=flat)
-![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat&logo=python&logoColor=white)
+# Databricks Study — lakehouse, Delta e Medallion
 
-Estudo de conceitos e prática de Azure Databricks: Lakehouse, Delta Lake, Spark e arquitetura Medallion.
+![Databricks](https://img.shields.io/badge/Databricks-FF3621?logo=databricks&logoColor=white)
+![Apache%20Spark](https://img.shields.io/badge/Apache%20Spark-3.5.0-E25A1C?logo=apachespark&logoColor=white)
+![Delta%20Lake](https://img.shields.io/badge/Delta%20Lake-3.1.0-00ADD8?logo=delta&logoColor=white)
 
-## Sobre
+Notas e notebooks de estudo sobre Azure Databricks: por que o lakehouse existe, o que o log do Delta Lake garante, como o Spark adia a execução, e um pipeline Bronze → Silver → Gold com dados fictícios de loja e de e-commerce. Unity Catalog e a comparação com o Synapse estão só na documentação; não há código deles aqui. Nada disso é um pipeline de produção.
 
-Repositório de estudo sobre Azure Databricks, com o objetivo de entender **por que** a plataforma existe e quais problemas reais de engenharia de dados ela resolve — não só decorar comandos. Combina documentação teórica em Markdown com notebooks práticos comentados, rodáveis no Databricks Community Edition.
-
-## Conteúdo
-
-- Conceito de Lakehouse e por que ele existe (Data Warehouse vs Data Lake)
-- Delta Lake: transações ACID, schema enforcement, time travel, MERGE
-- Clusters e Apache Spark: lazy evaluation, partições, autoscaling
-- Arquitetura Medallion (Bronze → Silver → Gold) aplicada num pipeline real
-- Unity Catalog: governança e linhagem de dados
-- Comparação Azure Databricks vs Azure Synapse Analytics
+| Cenário, segundo `docs/06-databricks-vs-synapse.md` | Onde o texto aponta |
+| --- | --- |
+| ETL pesado em Spark, ML, notebooks multilinguagem | Databricks |
+| Warehouse SQL, Power BI nativo, BI para quem não escreve Spark | Synapse Analytics |
 
 ## Stack
 
-- **Processamento:** Apache Spark (PySpark)
-- **Armazenamento:** Delta Lake
-- **Ambiente:** Databricks Community Edition
-- **Linguagem:** Python
-
----
+- PySpark 3.5.0 e delta-spark 3.1.0 (`requirements.txt`)
+- notebooks no formato do Databricks (`# Databricks notebook source`, células `# COMMAND ----------`)
+- a variável `spark` é a do cluster; os scripts não criam `SparkSession`
+- o repositório não fixa a versão do Python
 
 ## Estrutura
 
 ```
-databricks-study/
-├── docs/                          # Teoria, conceitos, comparações
-│   ├── 01-lakehouse-conceito.md
-│   ├── 02-delta-lake.md
-│   ├── 03-clusters-e-spark.md
-│   ├── 04-medallion-architecture.md
-│   ├── 05-unity-catalog.md
-│   └── 06-databricks-vs-synapse.md
-├── notebooks/                     # Código real, comentado
-│   ├── 01_spark_dataframes_intro.py
-│   ├── 02_delta_lake_basics.py
-│   ├── 03_medallion_pipeline_demo.py
-│   └── 04_time_travel_demo.py
-└── requirements.txt
+.
+├── requirements.txt
+├── docs/
+│   ├── 01-lakehouse-conceito.md        # warehouse, data lake e o meio-termo
+│   ├── 02-delta-lake.md                # ACID, time travel, schema enforcement
+│   ├── 03-clusters-e-spark.md          # driver, particao e lazy evaluation
+│   ├── 04-medallion-architecture.md    # Bronze, Silver, Gold
+│   ├── 05-unity-catalog.md             # catálogo, GRANT e linhagem
+│   └── 06-databricks-vs-synapse.md     # quando o texto escolhe cada um
+└── notebooks/
+    ├── 01_spark_dataframes_intro.py    # filter/groupBy só rodam no show
+    ├── 02_delta_lake_basics.py         # overwrite, MERGE e versionAsOf
+    ├── 03_medallion_pipeline_demo.py   # vendas sujas até a Gold
+    └── 04_time_travel_demo.py          # corrige PED004 e lê a versão 0
 ```
 
-## Como rodar localmente
+`02` grava em `/tmp/delta/vendas_lojas`. `03` e `04` usam `/tmp/delta/medallion_ecommerce`. `04` assume que `03` já rodou. Os dados são `Row` montados no próprio notebook (lojas e pedidos `PED001`–`PED005`), com nulo e duplicata de propósito na Bronze.
 
-**Pré-requisitos:** conta gratuita em [community.cloud.databricks.com](https://community.cloud.databricks.com)
+## Como rodar
 
-1. Suba os arquivos `.py` da pasta `notebooks/` — o Databricks reconhece o marcador `# COMMAND ----------` e importa como células separadas automaticamente
-2. Suba um cluster (Community Edition tem 1 cluster free, 15GB)
-3. Rode as células em ordem
-
-Alternativamente, dá para rodar localmente com PySpark + Delta Lake instalados (ver `requirements.txt`):
 ```bash
+git clone https://github.com/gabrielteramae/databricks-study.git
+cd databricks-study
+```
+
+No Databricks Community Edition, importe os `.py` de `notebooks/` (o marcador `# COMMAND ----------` vira célula), suba um cluster e rode na ordem 01 → 04. A Community Edition é o ambiente que os próprios notebooks citam.
+
+Localmente, as bibliotecas instalam assim:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Ordem de leitura sugerida
+Isso não executa os notebooks: eles chamam `spark` e `DeltaTable` sem criar a sessão.
 
-1. `docs/01-lakehouse-conceito.md` — o problema que o Databricks resolve
-2. `docs/02-delta-lake.md` — o formato de dados que sustenta tudo
-3. `docs/03-clusters-e-spark.md` — como o processamento distribuído funciona
-4. `notebooks/01_spark_dataframes_intro.py` — primeira mão na massa
-5. `notebooks/02_delta_lake_basics.py` — ACID, time travel na prática
-6. `docs/04-medallion-architecture.md` — padrão de organização de dados
-7. `notebooks/03_medallion_pipeline_demo.py` — pipeline Bronze → Silver → Gold
-8. `notebooks/04_time_travel_demo.py` — versionamento de tabelas
-9. `docs/05-unity-catalog.md` — governança de dados
-10. `docs/06-databricks-vs-synapse.md` — quando usar cada um no ecossistema Azure
+Ordem de leitura que o material pede: doc 01, doc 02, doc 03, notebook 01, notebook 02, doc 04, notebook 03, notebook 04, doc 05, doc 06.
 
+## Testes realizados
 
+Não há suíte de testes.
+
+---
+
+© 2026 Gabriel Teramae Chan
